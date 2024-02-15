@@ -19,3 +19,8 @@
 
 # Go workspace file
 go.work
+
+# the built executable
+tgbot-msg
+
+dist/

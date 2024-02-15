@@ -1,0 +1,18 @@
+#!/bin/bash
+
+start=$SECONDS
+"$@"
+ret=$?
+end=$SECONDS
+duration=$(( end - start ))
+duration=$(date -u -d @${duration} +"%T")
+
+msg=''
+msg+="host: $(hostname)"$'\n'
+msg+="PWD: ${PWD}"$'\n'
+msg+="$ $*"$'\n'
+msg+="ret = ${ret}, take ${duration}"$'\n'
+
+source ${TGBOT_ENV:-$HOME/.tgbot.env}
+tgbot-msg "$msg"
+exit $ret
