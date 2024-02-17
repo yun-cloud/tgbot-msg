@@ -1,10 +1,23 @@
 #!/bin/bash
 
+# source TGBOT_ENV if TGBOT_MSG_TOKEN is not defined
+if [ -z ${TGBOT_MSG_TOKEN+x} ] || [ -z ${TGBOT_MSG_CHATID+x} ]; then
+  TGBOT_ENV=${TGBOT_ENV:-$HOME/.tgbot.env}
+  if [ -f ${TGBOT_ENV} ]; then
+    source "${TGBOT_ENV}"
+  fi
+fi
+
+if [ -z ${TGBOT_MSG_TOKEN+x} ] || [ -z ${TGBOT_MSG_CHATID+x} ]; then
+  printf "process-notify: export 'TGBOT_MSG_TOKEN' and 'TGBOT_MSG_CHATID' in ${TGBOT_ENV}\n" >&2
+  exit 1
+fi
+
 start=$SECONDS
 "$@"
 ret=$?
 end=$SECONDS
-duration=$(( end - start ))
+duration=$((end - start))
 duration=$(date -u -d @${duration} +"%T")
 
 msg=''
@@ -13,6 +26,5 @@ msg+="PWD: ${PWD}"$'\n'
 msg+="$ $*"$'\n'
 msg+="ret = ${ret}, take ${duration}"$'\n'
 
-source ${TGBOT_ENV:-$HOME/.tgbot.env}
 tgbot-msg "$msg"
 exit $ret
